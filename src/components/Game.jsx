@@ -7,6 +7,8 @@ const Game = () => {
     const [bombs, setBombs] = useState(10);
     const [time, setTime] = useState(120);
     const [gameOver, setGameOver] = useState(false);
+    const [grid, setGrid] = useState(() => initializeGrid());
+
 
     const minusFlag = () => {
         setFlags(flags -1);
@@ -20,22 +22,14 @@ const Game = () => {
         setFlags(10);
     }
 
-    const minusBombs = () => {
-        setBombs(bombs -1);
-    }
-
-    const restoreBombs = () => {
-        setBombs(10);
-    }
-
     const endGame = () => {
         setGameOver(true);
     }
 
     const resetGame = () => {
         restoreFlag();
-        restoreBombs();
         setGameOver(false);
+        setGrid(initializeGrid);
         setTime(120);
     }
 
@@ -52,6 +46,84 @@ const Game = () => {
         return () => clearInterval(timer);
     }, [time]);
 
+    function initializeGrid() {
+        let gridArray = Array.from({ length: 9 }, (_, rowIndex) =>
+            Array.from({ length: 9 }, (_, colIndex) => {
+                return {
+                    id: `${rowIndex}-${colIndex}`,
+                    isFlagged: false,
+                    hasBomb: false,
+                    bombsAround: "",
+                    show: true
+                };
+            })
+        );
+
+        let gridWithBombs = putBombs(gridArray, bombs);
+        countBombs(gridWithBombs);
+        return gridWithBombs;
+    }
+
+    function putBombs(grid, bombsToPlace){
+        let remainingBombs = bombsToPlace;
+        while(remainingBombs > 0){
+            let randomRow = Math.floor(Math.random() * 9);
+            let randomCol = Math.floor(Math.random() * 9);
+            if(!grid[randomRow][randomCol].hasBomb){
+                grid[randomRow][randomCol].hasBomb = true;
+                remainingBombs--;
+            }
+        }
+        return grid;
+    }
+
+    function countBombs(grid) {
+        let numRows = grid.length;
+        let numCols = grid[0].length;
+
+        for (let row = 0; row < numRows; row++) {
+            for (let col = 0; col < numCols; col++) {
+                if (!grid[row][col].hasBomb) {
+                    let bombCount = 0;
+
+                    for (let i = row - 1; i <= row + 1; i++) {
+                        for (let j = col - 1; j <= col + 1; j++) {
+                            if (i >= 0 && i < numRows && j >= 0 && j < numCols) {
+                                if (grid[i][j].hasBomb) {
+                                    bombCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    grid[row][col].bombsAround = bombCount > 0 ? bombCount.toString() : "";
+                }
+            }
+        }
+
+        return grid;
+    }
+
+    function handleTileUpdate(row, col, newTile) {
+        setGrid(prevGrid => {
+            const newGrid = [...prevGrid];
+            newGrid[row][col] = newTile;
+            return newGrid;
+        });
+    }
+    const showAllBombs = () => {
+        setGrid(prevGrid => {
+            const newGrid = prevGrid.map(row =>
+                row.map(tile => ({
+                    ...tile,
+                    show: tile.hasBomb ? true : tile.show
+                }))
+            );
+            return newGrid;
+        });
+    };
+
+
     return(
         <div className={"w-[400px] h-[500px] sm:w-[500px] md:w-[600px] lg:w-[800px] xl:w-[900px] bg-gray-300  border-outset border-8"}>
             <div className={"flex flex-col m-0 p-0"}>
@@ -62,8 +134,13 @@ const Game = () => {
                 />
                 <LowerGame
                     flags={flags}
-                    bombs={bombs}
                     gameOver={gameOver}
+                    grid={grid}
+                    handleTileUpdate={handleTileUpdate}
+                    minusFlag={minusFlag}
+                    increaseFlag={increaseFlag}
+                    endGame={endGame}
+                    showAllBombs={showAllBombs}
                 />
             </div>
         </div>
