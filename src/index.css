@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'Digital-7';
+    src: url('../src/assets/fonts/digital-7.ttf') format('truetype');
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .border-outset {
+        border-style: outset;
+    }
+    .border-inset {
+        border-style: inset;
+    }
+    .font-digital {
+        font-family: 'Digital-7', sans-serif;
+    }
+    .score-format {
+        @apply flex justify-center items-center m-0 p-[1px] bg-black w-[45px] h-[29px];
+    }
+}
