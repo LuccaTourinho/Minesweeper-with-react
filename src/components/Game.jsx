@@ -29,8 +29,8 @@ const Game = () => {
     const resetGame = () => {
         restoreFlag();
         setGameOver(false);
-        setGrid(initializeGrid);
         setTime(120);
+        setGrid(() => initializeGrid());
     }
 
     useEffect(() => {
@@ -54,14 +54,13 @@ const Game = () => {
                     isFlagged: false,
                     hasBomb: false,
                     bombsAround: "",
-                    show: true
+                    show: false
                 };
             })
         );
 
         let gridWithBombs = putBombs(gridArray, bombs);
-        countBombs(gridWithBombs);
-        return gridWithBombs;
+        return countBombs(gridWithBombs);
     }
 
     function putBombs(grid, bombsToPlace){

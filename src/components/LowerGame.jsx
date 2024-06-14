@@ -8,7 +8,7 @@ const LowerGame = ({flags, gameOver, grid, handleTileUpdate, minusFlag, increase
             <div className={"grid grid-cols-9 gap-0 w-full h-full"}>
                 {
                     grid.flat().map(tile => (
-                        <Tile key={tile.id} value={tile} handleTileUpdate={handleTileUpdate} endGame={endGame} minusFlag={minusFlag} increaseFlag={increaseFlag} showAllBombs={showAllBombs}/>
+                        <Tile key={tile.id} value={tile} flags={flags} gameOver={gameOver} handleTileUpdate={handleTileUpdate} endGame={endGame} minusFlag={minusFlag} increaseFlag={increaseFlag} showAllBombs={showAllBombs}/>
                     ))
                 }
             </div>
